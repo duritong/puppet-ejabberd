@@ -1,9 +1,32 @@
-# modules/skeleton/manifests/init.pp - manage skeleton stuff
+# manifests/init.pp - manage ejabberd stuff
 # Copyright (C) 2007 admin@immerda.ch
-#
+# GPLv3
 
-# modules_dir { "skeleton": }
+class ejabberd {
+    case $operatingsystem {
+        default: { include ejabberd::base }
+    }
+}
 
-class skeleton {
+class ejabberd::base {
+    package{'ejabberd':
+        ensure => installed,
+    }
+
+    file{'/etc/ejabberd/ejabberd.cfg':
+      source => [ "puppet://$server/files/ejabberd/${fqdn}/ejabberd.cfg",
+                  "puppet://$server/files/ejabberd/ejabberd.cfg",
+                  "puppet://$server/ejabberd/ejabberd.cfg" ],
+      require => Package['ejabberd'],
+      notify => Service['ejabberd'],
+      owner => root, group => 0, mode => 0644;
+    }
+
+    service{ejabberd:
+        ensure => running,
+        enable => true,
+        hasstatus => true, #fixme!
+        require => Package[ejabberd],
+    }
 
 }
