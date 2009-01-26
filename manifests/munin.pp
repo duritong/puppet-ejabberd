@@ -7,17 +7,17 @@ class ejabberd::munin {
     ensure => absent,
   }
   munin::plugin{'ejabberd_users': 
-    require => Munin::Plugin::Deploy['ejabberd_users'],
+    require => Munin::Plugin::Deploy['ejabberd_'],
     ensure => 'ejabberd_',
     config => "env.vhosts ${$ejabberd_domains}\nuser root" 
   }
   munin::plugin{'ejabberd_connections': 
-    require => Munin::Plugin::Deploy['ejabberd_users'],
+    require => Munin::Plugin::Deploy['ejabberd_'],
     ensure => 'ejabberd_',
     config => "env.vhosts ${$ejabberd_domains}\nuser root" 
   }
   munin::plugin{'ejabberd_registrations': 
-    require => Munin::Plugin::Deploy['ejabberd_users'],
+    require => Munin::Plugin::Deploy['ejabberd_'],
     ensure => 'ejabberd_',
     config => "env.vhosts ${$ejabberd_domains}\nuser root" 
   }
