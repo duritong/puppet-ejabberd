@@ -29,4 +29,7 @@ class ejabberd::base {
         require => Package[ejabberd],
     }
 
+    if $use_munin {
+        include ejabberd::munin
+    }
 }
