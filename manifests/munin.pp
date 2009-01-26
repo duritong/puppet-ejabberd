@@ -3,7 +3,7 @@ class ejabberd::munin {
     '': { $ejabberd_domains = $fqdn }
   }
   munin::plugin::deploy{'ejabberd_users': 
-    source => "puppet://$server/ejabberd/munin/ejabberd_", 
+    source => "ejabberd/munin/ejabberd_", 
     config => "env.vhosts ${$ejabberd_domains}\nuser root" 
   }
   munin::plugin{'ejabberd_connections': 
