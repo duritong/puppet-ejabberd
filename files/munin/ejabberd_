@@ -110,7 +110,7 @@ if [ "$1" = "config" ]; then
 #        echo 'connected_users.info Number of logged in users'
 #        echo 'connected_users.label connected users'
 	for host in $vhosts; do
-	    formathost=$(echo $host | tr '.' '_')
+	    formathost=$(echo $host | tr '.-' '_')
 	    echo "connected_users_$formathost.label $host connected users";
 	    echo "connected_unique_users_$formathost.label $host unique connected users";
 	done;
@@ -118,7 +118,7 @@ if [ "$1" = "config" ]; then
 	echo 'graph_title ejabberd registrations'
 	echo 'graph_vlabel users'
 	for host in $vhosts; do
-	    formathost=$(echo $host | tr '.' '_')
+	    formathost=$(echo $host | tr '.-' '_')
 	    echo "registered_$formathost.label $host registered users"; 
 	    echo "registered_$formathost.info Registered users for vhost $host"
 	done;
@@ -140,7 +140,7 @@ if [ "$MODE" == "users" ]; then
 #    $EJCTL connected-users | awk -F/ '{print $1}' | sort | uniq | wc -l
 
     for host in $vhosts; do
-	formathost=$(echo $host | tr '.' '_')
+	formathost=$(echo $host | tr '.-' '_')
 	echo -n "connected_users_$formathost.value "; 
 	$EJCTL connected-users | grep "@$host" | wc -l
 	echo -n "connected_unique_users_$formathost.value "; 
@@ -151,7 +151,7 @@ fi
 
 if [ "$MODE" == "registrations" ]; then
     for host in $vhosts; do
-	formathost=$(echo $host | tr '.' '_')
+	formathost=$(echo $host | tr '.-' '_')
 	echo -n "registered_$formathost.value "; 
 	num=$($EJCTL vhost $host registered-users)
         if [ "$?" != 0 ]; then
