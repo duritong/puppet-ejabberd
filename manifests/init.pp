@@ -6,6 +6,13 @@ class ejabberd {
     case $operatingsystem {
         default: { include ejabberd::base }
     }
+    if $use_nagios {
+        include ejabberd::nagios
+    }
+
+    if $use_munin {
+        include ejabberd::munin
+    }
 }
 
 class ejabberd::base {
@@ -27,9 +34,5 @@ class ejabberd::base {
         enable => true,
         hasstatus => true, #fixme!
         require => Package[ejabberd],
-    }
-
-    if $use_munin {
-        include ejabberd::munin
     }
 }
