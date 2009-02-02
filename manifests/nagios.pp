@@ -1,6 +1,6 @@
 # manifests/nagios.pp
 
-class jabber::nagios {
+class ejabberd::nagios {
     case $jabber_nagios_domain {
         '': { $jabber_nagios_domain = $fqdn }
     }
