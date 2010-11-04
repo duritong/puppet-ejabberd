@@ -3,18 +3,18 @@
 # GPLv3
 
 class ejabberd {
-    case $operatingsystem {
-        default: { include ejabberd::base }
-    }
-    if $use_nagios {
-        include ejabberd::nagios
-    }
+  case $operatingsystem {
+    default: { include ejabberd::base }
+  }
+  if $use_nagios {
+    include ejabberd::nagios
+  }
 
-    if $use_munin {
-        include ejabberd::munin
-    }
+  if $use_munin {
+    include ejabberd::munin
+  }
 
-    if $use_shorewall {
-      include shorewall::rules::jabberserver
-    }
+  if $use_shorewall {
+    include shorewall::rules::jabberserver
+  }
 }
