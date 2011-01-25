@@ -5,6 +5,17 @@ class ejabberd::nagios {
     '': { $jabber_nagios_domain = $fqdn }
   }
   nagios::service{ "jabber_${fqdn}": check_command => "check_jabber!${jabber_nagios_domain}" }
+  @@nagios_command{
+    'check_jabber_ssl':
+      command_line => '$USER1$/check_jabber -S -p 5223 -H $ARG1$',
+  }
+  nagios::service{ "jabber_ssl_${fqdn}": check_command => "check_jabber_ssl!${jabber_nagios_domain}" }
+
+  @@nagios_command{
+    'check_jabber_cert':
+      command_line => '$USER1$/check_jabber -S -D 10 -p 5223 -H $ARG1$',
+  }
+  nagios::service{ "jabber_cert_${fqdn}": check_command => "check_jabber_cert!${jabber_nagios_domain}" }
 
   case $jabber_nagios_user {
     '': { $jabber_nagios_user = 'nagios' }
