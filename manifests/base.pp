@@ -9,7 +9,7 @@ class ejabberd::base {
                 "puppet:///modules/ejabberd/ejabberd.cfg" ],
     require => Package['ejabberd'],
     notify => Service['ejabberd'],
-    owner => ejabberd, group => ejabberd, mode => 0640;
+    owner => root, group => ejabberd, mode => 0640;
   }
 
   service{'ejabberd':
