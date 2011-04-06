@@ -21,10 +21,6 @@ class ejabberd::nagios {
     '': { $jabber_nagios_user = 'nagios' }
   } 
 
-  nagios::plugin{'check_jabber_login':
-    source => 'ejabberd/nagios/check_jabber_login';
-  }
-
   @@nagios_command{
     'check_jabber_login':
       command_line => '$USER1$/check_jabber_login $ARG1$ $ARG2$',
