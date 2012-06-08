@@ -4,8 +4,8 @@ class ejabberd::base {
   }
 
   file{'/etc/ejabberd/ejabberd.cfg':
-    source => [ "puppet:///modules/site-ejabberd/${fqdn}/ejabberd.cfg",
-                "puppet:///modules/site-ejabberd/ejabberd.cfg",
+    source => [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.cfg",
+                "puppet:///modules/site_ejabberd/ejabberd.cfg",
                 "puppet:///modules/ejabberd/ejabberd.cfg" ],
     require => Package['ejabberd'],
     notify => Service['ejabberd'],

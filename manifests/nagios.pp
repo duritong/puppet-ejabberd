@@ -1,25 +1,18 @@
 # manifests/nagios.pp
 
 class ejabberd::nagios {
-  case $jabber_nagios_domain {
-    '': { $jabber_nagios_domain = $fqdn }
-  }
-  nagios::service{ "jabber_${fqdn}": check_command => "check_jabber!${jabber_nagios_domain}" }
+  nagios::service{ "jabber_${::fqdn}": check_command => "check_jabber!${ejabberd::nagios_domain}" }
   @@nagios_command{
     'check_jabber_ssl':
       command_line => '$USER1$/check_jabber -S -p 5223 -H $ARG1$',
   }
-  nagios::service{ "jabber_ssl_${fqdn}": check_command => "check_jabber_ssl!${jabber_nagios_domain}" }
+  nagios::service{ "jabber_ssl_${::fqdn}": check_command => "check_jabber_ssl!${ejabberd::nagios_domain}" }
 
   @@nagios_command{
     'check_jabber_cert':
       command_line => '$USER1$/check_jabber -S -D 10 -p 5223 -H $ARG1$',
   }
-  nagios::service{ "jabber_cert_${fqdn}": check_command => "check_jabber_cert!${jabber_nagios_domain}" }
-
-  case $jabber_nagios_user {
-    '': { $jabber_nagios_user = 'nagios' }
-  } 
+  nagios::service{ "jabber_cert_${::fqdn}": check_command => "check_jabber_cert!${ejabberd::nagios_domain}" }
 
   @@nagios_command{
     'check_jabber_login':
@@ -27,10 +20,10 @@ class ejabberd::nagios {
       require => Nagios::Plugin['check_jabber_login'];
   }
 
-  case $jabber_nagios_pwd {
-    '': { info("no \$jabber_nagios_pwd supplied for ${fqdn}! Can't test jabber login") }
-    default: { 
-      nagios::service{ "jabber_login_${fqdn}": check_command => "check_jabber_login!${jabber_nagios_user}@${jabber_nagios_domain}!${jabber_nagios_pwd}" }
+  case $ejabberd::nagios_pwd {
+    '': { info("no \$ejabberd::nagios_pwd supplied for ${::fqdn}! Can't test jabber login") }
+    default: {
+      nagios::service{ "jabber_login_${::fqdn}": check_command => "check_jabber_login!${ejabberd::nagios_user}@${ejabberd::nagios_domain}!${ejabberd::nagios_pwd}" }
     }
   }
 }

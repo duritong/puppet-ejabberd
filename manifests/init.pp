@@ -2,19 +2,24 @@
 # Copyright (C) 2007 admin@immerda.ch
 # GPLv3
 
-class ejabberd {
-  case $operatingsystem {
+class ejabberd(
+  $domains = $::fqdn,
+  $nagios_domain = hiera('ejabberd_nagios_domain', $::fqdn),
+  $nagios_user = hiera('ejabberd_nagios_user', 'nagios'),
+  $nagios_pwd = hiera('ejabberd_nagios_pwd','')
+) {
+  case $::operatingsystem {
     default: { include ejabberd::base }
   }
-  if $use_nagios {
+  if hiera('use_nagios',false) {
     include ejabberd::nagios
   }
 
-  if $use_munin {
+  if hiera('use_munin',false) {
     include ejabberd::munin
   }
 
-  if $use_shorewall {
+  if hiera('use_shorewall',false) {
     include shorewall::rules::jabberserver
   }
 }
