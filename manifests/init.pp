@@ -3,23 +3,26 @@
 # GPLv3
 
 class ejabberd(
-  $domains = $::fqdn,
-  $nagios_domain = hiera('ejabberd_nagios_domain', $::fqdn),
-  $nagios_user = hiera('ejabberd_nagios_user', 'nagios'),
-  $nagios_pwd = hiera('ejabberd_nagios_pwd','')
+  $domains          = $::fqdn,
+  $nagios_domain    = $::fqdn,
+  $nagios_user      = 'nagios',
+  $nagios_pwd       = '',
+  $manage_nagios    = false,
+  $manage_munin     = false,
+  $manage_shorewall = false
 ) {
   case $::operatingsystem {
     default: { include ejabberd::base }
   }
-  if hiera('use_nagios',false) {
+  if $manage_nagios {
     include ejabberd::nagios
   }
 
-  if hiera('use_munin',false) {
+  if $manage_munin {
     include ejabberd::munin
   }
 
-  if hiera('use_shorewall',false) {
+  if $manage_shorewall {
     include shorewall::rules::jabberserver
   }
 }
