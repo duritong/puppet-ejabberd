@@ -7,6 +7,6 @@ class ejabberd::munin {
   munin::plugin{['ejabberd_users','ejabberd_connections','ejabberd_registrations']:
     require => Munin::Plugin::Deploy['ejabberd_'],
     ensure => 'ejabberd_',
-    config => "env.vhosts ${domains}\ntimeout 20\nuser root\ngroup root"
+    config => "env.vhosts ${domains}\ntimeout 30\nuser root\ngroup root"
   }
 }
