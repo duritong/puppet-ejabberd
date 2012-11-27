@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # Munin plugin for ejabberd.
 #
 # Written by Lasse Karstensen <lkarsten@hyse.org> 2007-05-27.
@@ -8,15 +8,15 @@
 # As connected users, registered users and server-connections have somewhat
 # different scales, this plugin uses munins suggest feature to create three
 # different graphs.
-# 
+#
 # ejabberd_connections
 # ejabberd_users
-# ejabberd_registrations 	
+# ejabberd_registrations
 #
-# use ln -s ejabberd ejabberd_(connections|users|registrations) 
+# use ln -s ejabberd ejabberd_(connections|users|registrations)
 # to activate.
 #
-# If the autodetect-feature for vhosts breaks, you can set  
+# If the autodetect-feature for vhosts breaks, you can set
 # """
 # [ejabberd*]
 # env.vhosts foo.com bar.com
@@ -29,59 +29,59 @@
 
 EJCTL=$ejctl
 if [ "$EJCTL" == "" ]; then
-    EJCTL=`which ejabberdctl||echo "/usr/sbin/ejabberdctl"`
+  EJCTL=`which ejabberdctl||echo "/usr/sbin/ejabberdctl"`
 fi
 if [ "$1" == "autoconf" ]; then
-        if [ -x $EJCTL > /dev/null ]; then
-                echo yes
-                exit 0
-        fi
-        echo "no (ejabberdctl not found)"
-        exit 1
+  if [ -x $EJCTL > /dev/null ]; then
+    echo yes
+    exit 0
+  fi
+  echo "no (ejabberdctl not found)"
+  exit 1
 fi
 
 if [ "$1" == "suggest" ]; then
-    echo "connections"
-    echo "users"
-    echo "registrations"
-    exit 0
+  echo "connections"
+  echo "users"
+  echo "registrations"
+  exit 0
 fi
 
 # trying to autodetect running vhosts.
 if [ -z "$vhosts" ]; then
-    for CFGPATH in /etc/ejabberd /usr/local/ejabberd/etc; do
-	if [ -f "$CFGPATH/ejabberd.cfg" ]; then
-	    EJCFG=$CFGPATH/ejabberd.cfg;
-	fi
-    done
-    if [ -z "$EJCFG" ]; then
-        echo "Unable to find ejabberd.cfg. Exiting." > /dev/stderr
-        exit -1
+  for CFGPATH in /etc/ejabberd /usr/local/ejabberd/etc; do
+    if [ -f "$CFGPATH/ejabberd.cfg" ]; then
+        EJCFG=$CFGPATH/ejabberd.cfg;
     fi
+  done
+  if [ -z "$EJCFG" ]; then
+    echo "Unable to find ejabberd.cfg. Exiting." > /dev/stderr
+    exit -1
+  fi
 
-    # this is pretty trivial, and may break if you have many vhosts.
-    vhosts=$(egrep -A5 '^\{hosts' $EJCFG | \
-       egrep -v "^#" | \
+  # this is pretty trivial, and may break if you have many vhosts.
+  vhosts=$(egrep -A5 '^\{hosts' $EJCFG | \
+    egrep -v "^#" | \
     # make it one whole line.
-       tr '\n' ' ' | \
+    tr '\n' ' ' | \
     # eat what is before [ and after ] on the line.
-       sed -e 's/.*\[//' -e 's/\].*//' | \
+    sed -e 's/.*\[//' -e 's/\].*//' | \
     # remove the "s
-       sed -e 's/\"//g' | \
+    sed -e 's/\"//g' | \
     # clean up whitespaces
-       sed -e 's/ //g' | \
-       sed -e 's/,/ /g' | \
-    # hmm, wonder if this should be here. 
-       sed -e 's/localhost//' )
+    sed -e 's/ //g' | \
+    sed -e 's/,/ /g' | \
+    # hmm, wonder if this should be here.
+    sed -e 's/localhost//' )
     # all set!
-    # okay, not so trivial. hope it works. if you get funky results, 
-    # try adjusting the "egrep -Ax" above. 
+    # okay, not so trivial. hope it works. if you get funky results,
+    # try adjusting the "egrep -Ax" above.
 fi
 
 if [ -z "$vhosts" ]; then
-    echo "No vhosts to sample." > /dev/stderr
-    echo "Please set env.vhosts in plugins-conf.d/munin-node." > /dev/stderr
-    exit -1
+  echo "No vhosts to sample." > /dev/stderr
+  echo "Please set env.vhosts in plugins-conf.d/munin-node." > /dev/stderr
+  exit -1
 fi
 
 MODE=`basename $0 | sed 's/^ejabberd_//g'`
@@ -93,73 +93,74 @@ if ! [ "$MODE" == "connections" -o "$MODE" == "users" \
 fi
 
 if [ "$1" = "config" ]; then
-    echo 'graph_args --base 1000 -l 0'
-    echo 'graph_scale no'
-    echo 'graph_category ejabberd'
-    echo 'graph_info This graph shows a statistic of ejabberd '
+  echo 'graph_args --base 1000 -l 0'
+  echo 'graph_scale no'
+  echo 'graph_category ejabberd'
+  echo 'graph_info This graph shows a statistic of ejabberd '
 
-    if [ "$MODE" == "connections" ]; then
-        echo 's2s_connections_out.label incoming s2s connections'
-        echo 's2s_connections_out.info Number of outgoing server to server connections'
+  if [ "$MODE" == "connections" ]; then
+    echo 's2s_connections_out.label incoming s2s connections'
+    echo 's2s_connections_out.info Number of outgoing server to server connections'
 
-        echo 's2s_connections_in.label outgoing s2s connections'
-        echo 's2s_connections_in.info Number of incoming server to server connections'
-    elif [ "$MODE" == "users" ]; then
-	echo 'graph_title ejabberd connected users'
-	echo 'graph_vlabel users'
-#        echo 'connected_users.info Number of logged in users'
-#        echo 'connected_users.label connected users'
-	for host in $vhosts; do
-	    formathost=$(echo $host | tr '.-' '_')
-	    echo "connected_users_$formathost.label $host connected users";
-	    echo "connected_unique_users_$formathost.label $host unique connected users";
-	done;
-    elif [ "$MODE" == "registrations" ]; then
-	echo 'graph_title ejabberd registrations'
-	echo 'graph_vlabel users'
-	for host in $vhosts; do
-	    formathost=$(echo $host | tr '.-' '_')
-	    echo "registered_$formathost.label $host registered users"; 
-	    echo "registered_$formathost.info Registered users for vhost $host"
-	done;
-    fi
-    exit 0
+    echo 's2s_connections_in.label outgoing s2s connections'
+    echo 's2s_connections_in.info Number of incoming server to server connections'
+  elif [ "$MODE" == "users" ]; then
+    echo 'graph_title ejabberd connected users'
+    echo 'graph_vlabel users'
+    for host in $vhosts; do
+      formathost=$(echo $host | tr '.-' '_')
+      echo "connected_users_$formathost.label $host connected users";
+      echo "connected_unique_users_$formathost.label $host unique connected users";
+    done;
+  elif [ "$MODE" == "registrations" ]; then
+    echo 'graph_title ejabberd registrations'
+    echo 'graph_vlabel users'
+    for host in $vhosts; do
+        formathost=$(echo $host | tr '.-' '_')
+        echo "registered_$formathost.label $host registered users";
+        echo "registered_$formathost.info Registered users for vhost $host"
+    done;
+  fi
+  exit 0
 fi
 
 
 if [ "$MODE" == "connections" ]; then
-    echo -n "s2s_connections_out.value "
-    $EJCTL outgoing-s2s-number
-    echo -n "s2s_connections_in.value "
-    $EJCTL incoming-s2s-number
-    exit 0
+  echo -n "s2s_connections_out.value "
+  $EJCTL outgoing-s2s-number
+  echo -n "s2s_connections_in.value "
+  $EJCTL incoming-s2s-number
+  exit 0
 fi
 
 if [ "$MODE" == "users" ]; then
-#    echo -n "connected_unique_users.value "
-#    $EJCTL connected-users | awk -F/ '{print $1}' | sort | uniq | wc -l
-
-    for host in $vhosts; do
-	formathost=$(echo $host | tr '.-' '_')
-	echo -n "connected_users_$formathost.value "; 
-	$EJCTL connected-users | grep "@$host" | wc -l
-	echo -n "connected_unique_users_$formathost.value "; 
-	$EJCTL connected-users | grep "@$host" | awk -F/ '{print $1}' | sort | uniq | wc -l
-    done
-    exit 0
+  connected_users=`$EJCTL connected-users`
+  for host in $vhosts; do
+    formathost=$(echo $host | tr '.-' '_')
+    echo -n "connected_users_$formathost.value ";
+    echo $connected_users | grep "@$host" | wc -l
+    echo -n "connected_unique_users_$formathost.value ";
+    echo $connected_users | grep "@$host" | awk -F/ '{print $1}' | sort | uniq | wc -l
+  done
+  exit 0
 fi
 
 if [ "$MODE" == "registrations" ]; then
-    for host in $vhosts; do
-	formathost=$(echo $host | tr '.-' '_')
-	echo -n "registered_$formathost.value "; 
-	num=$($EJCTL registered-users $host)
-        if [ "$?" != 0 ]; then
-            echo "U"
-        else
-            echo $num | wc -w
-        fi
-    done
-    exit 0
+  for host in $vhosts; do
+    formathost=$(echo $host | tr '.-' '_')
+    echo -n "registered_$formathost.value ";
+    stat_file="/var/lib/munin/plugin-state/ejabberd_registrations_${host}"
+    if [ -f $stat_file ]; then
+      num=$(cat $stat_file)
+    else
+      num=$($EJCTL registered-users $host)
+    fi
+    if [ "$?" != 0 ]; then
+      echo "U"
+    else
+      echo $num | wc -w
+    fi
+  done
+  exit 0
 fi
 
