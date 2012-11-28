@@ -1,4 +1,4 @@
 4-59/5 * * * * root /usr/sbin/ejabberdctl outgoing-s2s-number > /var/lib/munin/plugin-state/ejabberd_conns_out && chgrp munin /var/lib/munin/plugin-state/ejabberd_conns_out && chmod o-rwx /var/lib/munin/plugin-state/ejabberd_conns_out 2>/dev/null
-4-59/5 * * * * root /usr/sbin/ejabberdctl incoming-s2s-number > /var/lib/munin/plugin-state/ejabberd_conns_in && chgrp /var/lib/munin/plugin-state/ejabberd_conns_in && chmod o-rwx /var/lib/munin/plugin-state/ejabberd_conns_in 2>/dev/null
+4-59/5 * * * * root /usr/sbin/ejabberdctl incoming-s2s-number > /var/lib/munin/plugin-state/ejabberd_conns_in && chgrp munin /var/lib/munin/plugin-state/ejabberd_conns_in && chmod o-rwx /var/lib/munin/plugin-state/ejabberd_conns_in 2>/dev/null
 4-59/5 * * * * root /usr/sbin/ejabberdctl connected-users > /var/lib/munin/plugin-state/ejabberd_users && chgrp munin /var/lib/munin/plugin-state/ejabberd_users && chmod o-rwx /var/lib/munin/plugin-state/ejabberd_users 2>/dev/null
 
