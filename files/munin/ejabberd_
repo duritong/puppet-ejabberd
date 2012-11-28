@@ -126,15 +126,30 @@ fi
 
 
 if [ "$MODE" == "connections" ]; then
-  echo -n "s2s_connections_out.value "
-  $EJCTL outgoing-s2s-number
-  echo -n "s2s_connections_in.value "
-  $EJCTL incoming-s2s-number
+  stat_file="/var/lib/munin/plugin-state/ejabberd_conns_out"
+  if [ -f $stat_file ]; then
+    out=$(cat $stat_file)
+  else
+    out=$($EJCTL outgoing-s2s-number)
+  fi
+  stat_file="/var/lib/munin/plugin-state/ejabberd_conns_in"
+  if [ -f $stat_file ]; then
+    in=$(cat $stat_file)
+  else
+    in=$($EJCTL incoming-s2s-number)
+  fi
+  echo "s2s_connections_out.value ${out}"
+  echo "s2s_connections_in.value ${in}"
   exit 0
 fi
 
 if [ "$MODE" == "users" ]; then
-  connected_users=`$EJCTL connected-users`
+  stat_file="/var/lib/munin/plugin-state/ejabberd_users"
+  if [ -f $stat_file ]; then
+    connected_users=$(cat $stat_file)
+  else
+    connected_users=$($EJCTL connected-users)
+  fi
   for host in $vhosts; do
     formathost=$(echo $host | tr '.-' '_')
     echo -n "connected_users_$formathost.value ";
