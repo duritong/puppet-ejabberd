@@ -11,15 +11,16 @@ class ejabberd::munin {
     config  => "env.vhosts ${domains}";
   }
   File {
-    require => Munin::Plugin['ejabberd_registrations'],
     owner   => root,
     group   => 0,
     mode    => '0700',
   }
   file{
     '/etc/cron.daily/ejabberd_registrations':
+      require => Munin::Plugin['ejabberd_registrations'],
       source  => 'puppet:///modules/ejabberd/munin/ejabberd_registrations.cron';
     '/etc/cron.d/ejabberd_munin':
+      require => Munin::Plugin['ejabberd_registrations'],
       source  => 'puppet:///modules/ejabberd/munin/ejabberd_munin.cron';
   }
 }
