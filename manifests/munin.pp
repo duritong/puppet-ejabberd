@@ -8,7 +8,7 @@ class ejabberd::munin {
   munin::plugin{['ejabberd_users','ejabberd_connections','ejabberd_registrations']:
     ensure  => 'ejabberd_',
     require => Munin::Plugin::Deploy['ejabberd_'],
-    config  => "env.vhosts ${domains}";
+    config  => "group munin\nenv.vhosts ${domains}";
   }
   File {
     owner   => root,
