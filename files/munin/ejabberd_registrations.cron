@@ -3,4 +3,6 @@
 for host in `cat /etc/munin/plugin-conf.d/ejabberd_registrations.conf  | grep env.vhosts | sed 's/env.vhosts //'`; do
   stat_file="/var/lib/munin/plugin-state/ejabberd_registrations_${host}"
   ejabberdctl registered-users $host > $stat_file
+  chgrp munin $stat_file
+  chmod o-rwx $stat_file
 done
