@@ -7,7 +7,7 @@ class ejabberd::munin {
   $domains = join($ejabberd::domains, ' ')
   munin::plugin{['ejabberd_users','ejabberd_connections','ejabberd_registrations']:
     ensure  => 'ejabberd_',
-    require => [ Munin::Plugin::Deploy['ejabberd_'] ],
+    require => Munin::Plugin::Deploy['ejabberd_'],
     config  => "env.vhosts ${domains}";
   }
   File {
@@ -20,7 +20,7 @@ class ejabberd::munin {
       require => Munin::Plugin['ejabberd_registrations'],
       source  => 'puppet:///modules/ejabberd/munin/ejabberd_registrations.cron';
     '/etc/cron.d/ejabberd_munin':
-      require => Munin::Plugin['ejabberd_registrations'],
+      require => Munin::Plugin['ejabberd_users','ejabberd_connections'],
       source  => 'puppet:///modules/ejabberd/munin/ejabberd_munin.cron';
   }
 }
