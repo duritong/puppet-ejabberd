@@ -21,6 +21,7 @@ class ejabberd::munin {
       source  => 'puppet:///modules/ejabberd/munin/ejabberd_registrations.cron';
     '/etc/cron.d/ejabberd_munin':
       require => Munin::Plugin['ejabberd_users','ejabberd_connections'],
+      mode    => '0600',
       source  => 'puppet:///modules/ejabberd/munin/ejabberd_munin.cron';
   }
 }
