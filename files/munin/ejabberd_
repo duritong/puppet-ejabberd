@@ -153,9 +153,9 @@ if [ "$MODE" == "users" ]; then
   for host in $vhosts; do
     formathost=$(echo $host | tr '.-' '_')
     echo -n "connected_users_$formathost.value ";
-    echo $connected_users | grep "@$host" | wc -l
+    echo "${connected_users}" | grep "@$host" | wc -l
     echo -n "connected_unique_users_$formathost.value ";
-    echo $connected_users | grep "@$host" | awk -F/ '{print $1}' | sort | uniq | wc -l
+    echo "${connected_users}" | grep "@$host" | awk -F/ '{print $1}' | sort | uniq | wc -l
   done
   exit 0
 fi
@@ -173,7 +173,7 @@ if [ "$MODE" == "registrations" ]; then
     if [ "$?" != 0 ]; then
       echo "U"
     else
-      echo $num | wc -w
+      echo "${num}" | wc -l
     fi
   done
   exit 0
