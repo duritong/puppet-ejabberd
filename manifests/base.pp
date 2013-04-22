@@ -18,16 +18,18 @@ class ejabberd::base {
     }
   } else {
     File['/etc/ejabberd/ejabberd.cfg']{
-      source => [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.cfg",
-                  'puppet:///modules/site_ejabberd/ejabberd.cfg',
-                  'puppet:///modules/ejabberd/ejabberd.cfg' ]
+		content => template('ejabberd/ejabberd.cfg.erb'),
+#      source => [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.cfg",
+#                  'puppet:///modules/site_ejabberd/ejabberd.cfg',
+#                  'puppet:///modules/ejabberd/ejabberd.cfg' ]
     }
   }
 
   service{'ejabberd':
     ensure    => running,
     enable    => true,
-    hasstatus => true,
+    hasstatus => false,
+    hasrestart => true,
     require   => Package['ejabberd'],
   }
 }
