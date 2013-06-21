@@ -58,11 +58,7 @@ override_global.
 {acl, admin, {user, "admin"}}.
 
 %% Hostname
-{hosts, [
-	<% @domains.each do |domain| -%>
-	"<%= domain %>",
-	<% end -%>
-]}.
+{hosts, [<%= @domains %>]}.
 
 
 
