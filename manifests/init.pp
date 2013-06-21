@@ -4,7 +4,7 @@
 
 # Manage an ejabberd server
 class ejabberd(
-  $domains          = $::fqdn,
+  $domains          = [$::fqdn],
   $config_content   = false,
   $nagios_domain    = $::fqdn,
   $nagios_user      = 'nagios',

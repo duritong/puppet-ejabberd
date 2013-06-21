@@ -55,10 +55,17 @@ override_global.
 %% Options which are set by Debconf and managed by ucf
 
 %% Admin user
-{acl, admin, {user, "admin", "<%= @domains %>"}}.
+{acl, admin, {user, "admin"}}.
 
 %% Hostname
-{hosts, ["<%= @domains %>"]}.
+{hosts, [
+	<% @domains.each do |domain| -%>
+	"<%= domain %>",
+	<% end -%>
+]}.
+
+
+
 
 %% "localhost", <%= @fqdn %> , , "<%= @domains %>" 
 
