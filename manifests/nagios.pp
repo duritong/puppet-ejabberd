@@ -10,7 +10,7 @@ class ejabberd::nagios {
 
   @@nagios_command{
     'check_jabber_cert':
-      command_line => '$USER1$/check_jabber -S -D 10 -p 5223 -H $ARG1$',
+      command_line => '$USER1$/check_jabber -S -D 8,5 -p 5223 -H $ARG1$',
   }
   nagios::service{ "jabber_cert_${::fqdn}": check_command => "check_jabber_cert!${ejabberd::nagios_domain}" }
 
