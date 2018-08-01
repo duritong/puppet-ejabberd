@@ -1,33 +1,39 @@
 # manages the basic stuff for the service
 class ejabberd::base {
-  package{'ejabberd':
-    ensure => installed,
+  if $facts['osfamily'] == 'RedHat' and $facts['operatingsystemmajrelease'] == '6' {
+    $config_file = '/etc/ejabberd/ejabberd.cfg'
+    if !$ejabberd::config_content {
+      $sources = [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.cfg",
+                  'puppet:///modules/site_ejabberd/ejabberd.cfg',
+                  'puppet:///modules/ejabberd/ejabberd.cfg', ]
+    }
+  } else {
+    $config_file = '/etc/ejabberd/ejabberd.yml'
+    if !$ejabberd::config_content {
+      $sources = [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.yml",
+                  'puppet:///modules/site_ejabberd/ejabberd.yml',
+                  'puppet:///modules/ejabberd/ejabberd.yml', ]
+    }
   }
 
-  file{'/etc/ejabberd/ejabberd.cfg':
-    require => Package['ejabberd'],
-    notify  => Service['ejabberd'],
-    owner   => 'root',
-    group   => 'ejabberd',
-    mode    => '0640';
+  package{'ejabberd':
+    ensure => installed,
+  } -> file{$config_file:
+    owner => 'root',
+    group => 'ejabberd',
+    mode  => '0640';
+  } ~> service{'ejabberd':
+    ensure => running,
+    enable => true,
   }
 
   if $ejabberd::config_content {
-    File['/etc/ejabberd/ejabberd.cfg']{
-      content => $ejabberd::config_content
+    File[$config_file]{
+      content => $ejabberd::config_content,
     }
   } else {
-    File['/etc/ejabberd/ejabberd.cfg']{
-      source => [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.cfg",
-                  'puppet:///modules/site_ejabberd/ejabberd.cfg',
-                  'puppet:///modules/ejabberd/ejabberd.cfg' ]
+    File[$config_file]{
+      source => $sources,
     }
-  }
-
-  service{'ejabberd':
-    ensure    => running,
-    enable    => true,
-    hasstatus => true,
-    require   => Package['ejabberd'],
   }
 }
