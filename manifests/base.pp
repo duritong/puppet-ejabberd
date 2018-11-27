@@ -8,7 +8,7 @@ class ejabberd::base {
                   'puppet:///modules/ejabberd/ejabberd.cfg', ]
     }
   } else {
-    $config_file = '/etc/ejabberd/ejabberd.yml'
+    $config_file = '/opt/ejabberd/conf/ejabberd.yml'
     if !$ejabberd::config_content {
       $sources = [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.yml",
                   'puppet:///modules/site_ejabberd/ejabberd.yml',
