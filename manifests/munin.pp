@@ -22,6 +22,7 @@ class ejabberd::munin {
     '/etc/cron.d/ejabberd_munin':
       require => Munin::Plugin['ejabberd_users','ejabberd_connections'],
       mode    => '0600',
-      source  => 'puppet:///modules/ejabberd/munin/ejabberd_munin.cron';
+      source  => [ "puppet:///modules/ejabberd/munin/ejabberd_munin.cron_CentOS_${facts['os']['release']['major']}",
+                  'puppet:///modules/ejabberd/munin/ejabberd_munin.cron' ];
   }
 }

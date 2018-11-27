@@ -29,7 +29,11 @@
 
 EJCTL=$ejctl
 if [ "$EJCTL" == "" ]; then
-  EJCTL=`which ejabberdctl||echo "/usr/sbin/ejabberdctl"`
+  if [ -x "/usr/sbin/ejabberdctl" ]; then
+    EJCTL="/usr/sbin/ejabberdctl"
+  else
+    EJCTL=$(ls -1 /opt/ejabberd-*/bin/ejabberdctl | head -n 1)
+  fi
 fi
 if [ "$1" == "autoconf" ]; then
   if [ -x $EJCTL > /dev/null ]; then
