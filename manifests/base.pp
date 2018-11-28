@@ -20,7 +20,7 @@ class ejabberd::base {
       path    => '/opt/ejabberd/conf/ejabberdctl.cfg',
       match   => '^(#)?ERLANG_NODE=',
       require => Package['ejabberd'],
-      before  => Package['ejabberd'],
+      before  => Service['ejabberd'],
     }
   }
 
