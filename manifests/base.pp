@@ -14,6 +14,14 @@ class ejabberd::base {
                   'puppet:///modules/site_ejabberd/ejabberd.yml',
                   'puppet:///modules/ejabberd/ejabberd.yml', ]
     }
+
+    file_line{'set_erlang_node_name':
+      line    => "ERLANG_NODE=ejabberd@${facts['fqdn']}",
+      path    => '/opt/ejabberd/conf/ejabberdctl.cfg',
+      match   => '^(#)?ERLANG_NODE=',
+      require => Package['ejabberd'],
+      before  => Package['ejabberd'],
+    }
   }
 
   package{'ejabberd':
