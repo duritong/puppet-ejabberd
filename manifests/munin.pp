@@ -5,7 +5,7 @@ class ejabberd::munin {
     source => 'ejabberd/munin/ejabberd_';
   }
   $domains = join($ejabberd::domains, ' ')
-  munin::plugin{['ejabberd_users','ejabberd_connections','ejabberd_registrations']:
+  munin::plugin{['ejabberd_users','ejabberd_connections']:
     ensure  => 'ejabberd_',
     require => Munin::Plugin::Deploy['ejabberd_'],
     config  => "group munin\nenv.vhosts ${domains}";
@@ -17,8 +17,7 @@ class ejabberd::munin {
   }
   file{
     '/etc/cron.daily/ejabberd_registrations':
-      require => Munin::Plugin['ejabberd_registrations'],
-      source  => 'puppet:///modules/ejabberd/munin/ejabberd_registrations.cron';
+      ensure => absent;
     '/etc/cron.d/ejabberd_munin':
       require => Munin::Plugin['ejabberd_users','ejabberd_connections'],
       mode    => '0600',
