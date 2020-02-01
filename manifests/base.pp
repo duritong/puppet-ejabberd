@@ -1,47 +1,38 @@
 # manages the basic stuff for the service
 class ejabberd::base {
-  if $facts['osfamily'] == 'RedHat' and $facts['operatingsystemmajrelease'] == '6' {
-    $config_file = '/etc/ejabberd/ejabberd.cfg'
-    if !$ejabberd::config_content {
-      $sources = [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.cfg",
-                  'puppet:///modules/site_ejabberd/ejabberd.cfg',
-                  'puppet:///modules/ejabberd/ejabberd.cfg', ]
-    }
-  } else {
-    $config_file = '/opt/ejabberd/conf/ejabberd.yml'
-    if !$ejabberd::config_content {
-      $sources = [ "puppet:///modules/site_ejabberd/${::fqdn}/ejabberd.yml",
-                  'puppet:///modules/site_ejabberd/ejabberd.yml',
-                  'puppet:///modules/ejabberd/ejabberd.yml', ]
-    }
 
-    file_line{'set_erlang_node_name':
-      line    => "ERLANG_NODE=ejabberd@${facts['fqdn']}",
-      path    => '/opt/ejabberd/conf/ejabberdctl.cfg',
-      match   => '^(#)?ERLANG_NODE=',
-      require => Package['ejabberd'],
-      before  => Service['ejabberd'],
-    }
-  }
-
+  include ::systemd::systemctl::daemon_reload
   package{'ejabberd':
     ensure => installed,
-  } -> file{$config_file:
-    owner => 'root',
-    group => 'ejabberd',
-    mode  => '0640';
+  } -> file_line{'set_erlang_node_name':
+    line   => "ERLANG_NODE=ejabberd@${facts['fqdn']}",
+    path   => '/opt/ejabberd/conf/ejabberdctl.cfg',
+    match  => '^(#)?ERLANG_NODE=',
+    notify => Service['ejabberd'],
+  } -> file{'/opt/ejabberd/conf/ejabberd.yml':
+    owner  => 'root',
+    group  => 'ejabberd',
+    mode   => '0640',
+    notify => Service['ejabberd'],
+  } -> exec{'copy-ejabberd-service-unit':
+    command => "cp /opt/ejabberd-$(rpm -q --queryformat='%{VERSION}' ejabberd)/bin/ejabberd.service /etc/systemd/system/ejabberd.service",
+    unless  => "diff -Naur /opt/ejabberd-$(rpm -q --queryformat='%{VERSION}' ejabberd)/bin/ejabberd.service /etc/systemd/system/ejabberd.service",
+    notify  => Exec['systemctl-daemon-reload'],
   } ~> service{'ejabberd':
-    ensure => running,
-    enable => true,
+    ensure  => running,
+    enable  => true,
+    require => Exec['systemctl-daemon-reload'],
   }
 
   if $ejabberd::config_content {
-    File[$config_file]{
+    File['/opt/ejabberd/conf/ejabberd.yml']{
       content => $ejabberd::config_content,
     }
   } else {
-    File[$config_file]{
-      source => $sources,
+    File['/opt/ejabberd/conf/ejabberd.yml']{
+      source => [ "puppet:///modules/site_ejabberd/${facts['fqdn']}/ejabberd.yml",
+                  'puppet:///modules/site_ejabberd/ejabberd.yml',
+                  'puppet:///modules/ejabberd/ejabberd.yml', ]
     }
   }
 }
