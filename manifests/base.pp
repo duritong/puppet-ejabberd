@@ -1,7 +1,6 @@
 # manages the basic stuff for the service
 class ejabberd::base {
 
-  include ::systemd::systemctl::daemon_reload
   package{'ejabberd':
     ensure => installed,
   } -> file_line{'set_erlang_node_name':
@@ -17,11 +16,9 @@ class ejabberd::base {
   } -> exec{'copy-ejabberd-service-unit':
     command => "cp /opt/ejabberd-$(rpm -q --queryformat='%{VERSION}' ejabberd)/bin/ejabberd.service /etc/systemd/system/ejabberd.service",
     unless  => "diff -Naur /opt/ejabberd-$(rpm -q --queryformat='%{VERSION}' ejabberd)/bin/ejabberd.service /etc/systemd/system/ejabberd.service",
-    notify  => Exec['systemctl-daemon-reload'],
   } ~> service{'ejabberd':
     ensure  => running,
     enable  => true,
-    require => Exec['systemctl-daemon-reload'],
   }
 
   if $ejabberd::config_content {
